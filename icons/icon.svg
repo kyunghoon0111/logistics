@@ -1,0 +1,27 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+
+  <!-- 트럭 아이콘 -->
+  <g transform="translate(96,52)" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 화물칸 -->
+    <rect x="-44" y="-18" width="52" height="36" rx="3" fill="rgba(255,255,255,0.15)"/>
+    <!-- 운전석 -->
+    <path d="M8,-18 L8,-6 Q8,4 18,6 L28,6 Q34,6 34,0 L34,-8 Q34,-18 24,-18 Z" fill="rgba(255,255,255,0.15)"/>
+    <!-- 바퀴 -->
+    <circle cx="-26" cy="22" r="6" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="3"/>
+    <circle cx="24" cy="22" r="6" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="3"/>
+    <!-- 지면 -->
+    <line x1="-50" y1="28" x2="40" y2="28" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  </g>
+
+  <!-- 텍스트 -->
+  <text x="96" y="128" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle" letter-spacing="1">물류관리사</text>
+  <text x="96" y="152" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="rgba(255,255,255,0.8)" text-anchor="middle">LOGISTICS</text>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="192" y2="192" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+</svg>
