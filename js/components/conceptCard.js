@@ -92,25 +92,81 @@ export function renderSectionContent(section) {
 }
 
 /**
- * 본문을 문장 단위로 끊어서 읽기 편하게 포맷팅
- * - 한국어 종결어미(다, 요, 음, 임, 됨) + 마침표 뒤 공백 기준으로 분리
- * - 2문장씩 하나의 문단으로 묶어 가독성 확보
+ * 본문을 구조화하여 읽기 쉽게 포맷팅
+ * - 번호/기호(1), ①, -, · 등)를 감지하여 리스트로 변환
+ * - 소제목(숫자+))을 감지하여 헤딩으로 변환
+ * - 나머지는 문장 단위 문단 분리
  */
 function formatContent(text) {
   const escaped = escHtml(text);
-  // 한국어 종결: ~다. ~요. ~음. ~임. ~됨. 뒤 공백으로 문장 분리
+
+  // 구조 패턴이 있는지 감지
+  const hasStructure = /(?:^|\s)[①②③④⑤⑥⑦⑧⑨⑩]|(?:^|\s)\d+\)|(?:^|\s)- /m.test(escaped);
+  if (!hasStructure) {
+    return formatPlainText(escaped);
+  }
+
+  // 줄 단위로 분리 (번호/기호 앞에서 줄바꿈)
+  const lines = escaped
+    .replace(/\s+([①②③④⑤⑥⑦⑧⑨⑩])/g, '\n$1')
+    .replace(/\s+(\d+\)\s)/g, '\n$1')
+    .replace(/\s+(- )/g, '\n- ')
+    .replace(/\s+(→\s)/g, '\n  → ')
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l);
+
+  let html = '';
+  let inList = false;
+  let listType = ''; // 'circle' | 'dash'
+
+  for (const line of lines) {
+    // 대제목: 1) 2) 등
+    if (/^\d+\)\s/.test(line)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      const content = line.replace(/^\d+\)\s*/, '');
+      html += `<div class="content-heading">${content}</div>`;
+      continue;
+    }
+    // 원숫자 항목: ① ② 등
+    if (/^[①②③④⑤⑥⑦⑧⑨⑩]/.test(line)) {
+      if (inList && listType !== 'circle') { html += '</ul>'; inList = false; }
+      if (!inList) { html += '<ul class="content-list circle">'; inList = true; listType = 'circle'; }
+      const marker = line.match(/^[①②③④⑤⑥⑦⑧⑨⑩]/)[0];
+      const content = line.slice(marker.length).replace(/^\s*/, '');
+      html += `<li><span class="list-marker">${marker}</span>${content}</li>`;
+      continue;
+    }
+    // 대시 항목: - 으로 시작
+    if (/^- /.test(line)) {
+      if (inList && listType !== 'dash') { html += '</ul>'; inList = false; }
+      if (!inList) { html += '<ul class="content-list dash">'; inList = true; listType = 'dash'; }
+      html += `<li>${line.slice(2)}</li>`;
+      continue;
+    }
+    // 화살표 하위 항목
+    if (/^\s*→\s/.test(line)) {
+      html += `<div class="content-arrow">${line.replace(/^\s*→\s*/, '')}</div>`;
+      continue;
+    }
+    // 일반 텍스트
+    if (inList) { html += '</ul>'; inList = false; }
+    html += `<p>${line}</p>`;
+  }
+  if (inList) html += '</ul>';
+
+  return html;
+}
+
+/** 구조가 없는 평문을 2문장씩 문단으로 분리 */
+function formatPlainText(escaped) {
   const sentences = escaped.split(/(?<=[다요음임됨]\.)\s+/);
-
-  if (sentences.length <= 2) {
-    return `<p>${sentences.join(' ')}</p>`;
-  }
-
-  const paragraphs = [];
+  if (sentences.length <= 2) return `<p>${sentences.join(' ')}</p>`;
+  const out = [];
   for (let i = 0; i < sentences.length; i += 2) {
-    const chunk = sentences.slice(i, i + 2).join(' ');
-    paragraphs.push(`<p>${chunk}</p>`);
+    out.push(`<p>${sentences.slice(i, i + 2).join(' ')}</p>`);
   }
-  return paragraphs.join('');
+  return out.join('');
 }
 
 function escHtml(str) {
