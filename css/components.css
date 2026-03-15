@@ -369,9 +369,10 @@ html.light .sql-block,
 
 .explanation-text {
   font-size: var(--text-sm);
-  line-height: var(--lh-relaxed);
+  line-height: 1.8;
   color: var(--text-secondary);
   margin-bottom: var(--sp-3);
+  word-break: keep-all;
 }
 .exam-tip-box {
   background: var(--tip-warning-bg);
@@ -380,7 +381,8 @@ html.light .sql-block,
   padding: var(--sp-3) var(--sp-3);
   font-size: var(--text-xs);
   color: var(--text-primary);
-  line-height: var(--lh-relaxed);
+  line-height: 1.8;
+  word-break: keep-all;
 }
 
 /* ===== 토스트 ===== */

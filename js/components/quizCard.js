@@ -1,7 +1,7 @@
 /**
  * quizCard.js - 퀴즈 문제 렌더러
  */
-import { highlightSQL } from './conceptCard.js';
+import { highlightSQL, formatText } from './conceptCard.js';
 
 /**
  * @param {object} quiz - 정규화된 퀴즈 객체
@@ -124,10 +124,10 @@ function showExplanation(el, quiz, correct) {
       <div class="explanation-result ${correct ? 'correct' : 'incorrect'}">
         ${correct ? '✅ 정답!' : '❌ 오답'}
       </div>
-      <div class="explanation-text">${escHtml(quiz.explanation)}</div>
+      <div class="explanation-text">${formatText(quiz.explanation)}</div>
       ${quiz.examTip ? `
         <div class="exam-tip-box">
-          💡 <strong>시험 팁:</strong> ${escHtml(quiz.examTip)}
+          💡 <strong>시험 팁:</strong> ${formatText(quiz.examTip)}
         </div>
       ` : ''}
     </div>

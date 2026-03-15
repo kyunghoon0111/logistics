@@ -10,9 +10,11 @@ const TIP_META = {
 };
 
 export function highlightSQL(text) {
-  // SQL 하이라이팅 제거 (물류관리사 앱에서 불필요)
   return String(text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+/** 외부에서도 사용할 수 있도록 export */
+export { formatContent, formatText };
 
 /**
  * 섹션 전체 내용 렌더링
@@ -37,7 +39,7 @@ export function renderSectionContent(section) {
         ${section.keyPoints.map(kp => `
           <div class="key-point-item">
             <div class="key-point-dot"></div>
-            <div>${escHtml(kp)}</div>
+            <div>${formatText(kp)}</div>
           </div>
         `).join('')}
       </div>
@@ -51,7 +53,7 @@ export function renderSectionContent(section) {
       return `
         <div class="tip-box ${tip.type || 'memory'}">
           <span class="tip-icon">${meta.icon}</span>
-          <strong>${meta.label}:</strong> ${escHtml(tip.text)}
+          <strong>${meta.label}:</strong> ${formatText(tip.text)}
         </div>
       `;
     }).join(''));
@@ -167,6 +169,28 @@ function formatPlainText(escaped) {
     out.push(`<p>${sentences.slice(i, i + 2).join(' ')}</p>`);
   }
   return out.join('');
+}
+
+/**
+ * 짧은 텍스트(해설, 팁 등) 포맷팅
+ * - 구조 마커 있으면 리스트로, 없으면 문장 단위 줄바꿈
+ */
+function formatText(text) {
+  if (!text) return '';
+  const raw = String(text);
+
+  // 구조 패턴 감지 → formatContent로 위임
+  if (/[①②③④⑤⑥⑦⑧⑨⑩]|\d\)\s|- /.test(raw)) {
+    return formatContent(raw);
+  }
+
+  const escaped = escHtml(raw);
+
+  // 짧으면 그대로
+  if (escaped.length < 120) return escaped;
+
+  // 문장 단위로 줄바꿈 삽입
+  return escaped.replace(/(?<=[다요음임됨]\.)\s+/g, '<br>');
 }
 
 function escHtml(str) {
